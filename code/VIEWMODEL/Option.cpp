@@ -168,7 +168,7 @@ bool option::init()
 
 	// add "StartMenu" splash screen"
 	auto optionback = Sprite::create("scene1.png");
-	//	sprite->setSkewX(20.0f);
+	optionback->setScale(1.1);
 	if (optionback == nullptr)
 	{
 		problemLoading("'scene1.png'");
