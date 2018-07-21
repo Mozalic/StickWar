@@ -1,6 +1,7 @@
 #include "StartMenu.h"
 #include "SimpleAudioEngine.h"
 #include "Option.h"
+#include "BattleField.h"
 
 USING_NS_CC;
 
@@ -158,8 +159,8 @@ void StartMenu::menuStartCallback(Ref* pSender)
 	auto director = Director::getInstance();
 	Size visibleSize = director->getVisibleSize();
 
-	auto optionScene = option::createScene();
+	auto startScene = BattleField::createScene();
 
-	Director::getInstance()->replaceScene(optionScene);
+	Director::getInstance()->replaceScene(startScene);
 
 }
