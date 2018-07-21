@@ -7,8 +7,6 @@
 USING_NS_CC;
 using namespace cocos2d::ui;
 
-int DIFFICULTY = 1;
-
 Scene* option::createScene()
 {
 	return option::create();
