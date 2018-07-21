@@ -3,6 +3,8 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include <vector>
+#include "SoldierModel.h"
+#include "SoldierType.h"
 
 USING_NS_CC;
 
@@ -16,6 +18,7 @@ public:
 	// a selector callback
 	void menuCloseCallback(cocos2d::Ref* pSender);
 	void FootmanButtonCallback(Ref *ref, ui::Widget::TouchEventType type);
+	void MinerButtonCallback(Ref *ref, ui::Widget::TouchEventType type);
 	void FootmanGenrate();
 	void update_soldier_move(float dt);
 	void update_money(float dt);
@@ -24,15 +27,12 @@ public:
 	// implement the "static create()" method manually
 	CREATE_FUNC(BattleField);
 private:
-	struct soldierItem {
-		Sprite *soldier;
-		float position;
-		int type;//1 = Footman
-	};
 	int money;
-	Label *moneyLabel;
-	std::vector<soldierItem> soldiers;
-	std::vector<soldierItem> enemy_soldiers;
+	Label* moneyLabel;
+	//Label* LM;
+	//Label* RM;
+	std::vector<soldierItem*> soldiers;
+	std::vector<soldierItem*> enemy_soldiers;
 	std::vector<SpriteFrame*> soldierFrames;
 	float leftmost,rightmost;
 	int time;

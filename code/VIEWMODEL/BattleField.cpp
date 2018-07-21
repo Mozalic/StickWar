@@ -36,6 +36,7 @@ bool BattleField::init() {
 		visibleSize.width / 2,
 		visibleSize.height / 2
 	));
+	backGround->setScale(1.1);
 	this->addChild(backGround);
 	
 	auto label1 = Label::createWithTTF(std::to_string(money), "fonts/arial.ttf", 24);
@@ -44,18 +45,39 @@ bool BattleField::init() {
 	moneyLabel = label1;
 	this->addChild(label1);
 
+	auto MinerButton = ui::Button::create(
+		"Miner_btn_normal.png", "Miner_btn_selected.png", "Miner_btn_selected.png");
+	MinerButton->setPosition(Vec2(
+		MinerButton->getContentSize().width*0.5,
+		visibleSize.height - MinerButton->getContentSize().height / 2));
+	//FootmanButton->getContentSize();
+	MinerButton->addTouchEventListener(CC_CALLBACK_2(
+		BattleField::MinerButtonCallback,
+		this));
+	this->addChild(MinerButton,1);
+
 	auto FootmanButton = ui::Button::create(
 		"footman_btn_normal.png", "footman_btn_selected.png", "footman_btn_selected.png");
 	FootmanButton->setPosition(Vec2(
-		FootmanButton->getContentSize().width/2,
-		visibleSize.height-FootmanButton->getContentSize().height/2));
+		FootmanButton->getContentSize().width*1.5,
+		visibleSize.height - FootmanButton->getContentSize().height / 2));
 	//FootmanButton->getContentSize();
 	FootmanButton->addTouchEventListener(CC_CALLBACK_2(
 		BattleField::FootmanButtonCallback,
 		this));
-
 	this->addChild(FootmanButton);
-
+	/*
+	auto LM1 = Label::createWithTTF(std::to_string(leftmost), "fonts/arial.ttf", 24);
+	auto RM1 = Label::createWithTTF(std::to_string(rightmost), "fonts/arial.ttf", 24);
+	LM = LM1;
+	RM = RM1;
+	LM->setPosition(Vec2(visibleSize.width / 2, 400));
+	RM->setPosition(Vec2(visibleSize.width / 2, 300));
+	LM->setColor(Color3B(0, 0, 0));
+	RM->setColor(Color3B(0, 0, 0));
+	this->addChild(LM);
+	this->addChild(RM);
+	*/
 	this->schedule(schedule_selector(BattleField::update_soldier_move), 0.1);
 	this->schedule(schedule_selector(BattleField::update_money), 1);
 	this->schedule(schedule_selector(BattleField::enemy_soldier_generater), 1);
@@ -92,45 +114,86 @@ void BattleField::FootmanButtonCallback(Ref * ref, ui::Widget::TouchEventType ty
 	}
 }
 
+void BattleField::MinerButtonCallback(Ref * ref, ui::Widget::TouchEventType type)
+{
+	if (money < 5)return;
+}
+
 void BattleField::FootmanGenrate()
 {
 	if (money < 10)return;
 	money -= 10;
 	auto Footman = Sprite::create("Footman.png");
 	Footman->setAnchorPoint(Vec2(0, 0));
-	Footman->setPosition(Vec2(0, 10* CCRANDOM_0_1()));
-	soldierItem tmp;
-	tmp.soldier = Footman;
-	tmp.type = 1;
-	tmp.position = 0;
+	Footman->setPosition(Vec2(0, 30* CCRANDOM_0_1()));
+	soldierItem* tmp=soldierItem::getInstance(Footman,0,FootmanHP,1);
 	soldiers.push_back(tmp);
 	this->addChild(Footman);
 }
 
 void BattleField::update_soldier_move(float dt) {
 	const int step = 10;
-	std::cout << leftmost << " " << rightmost << std::endl;
+	//LM->setString(std::to_string(leftmost));
+	//RM->setString(std::to_string(rightmost));
 	moneyLabel->setString(std::to_string(money));
 	auto moveleft = MoveBy::create(0.1, Vec2(step, 0));
 	auto moveright = MoveBy::create(0.1, Vec2(-1*step, 0));
+	int maxn = 0;
 	for (int i = 0; i < soldiers.size(); i++) {
-		if (soldiers[i].position+soldiers[i].soldier->getContentSize().width < rightmost) {
-			soldiers[i].soldier->runAction(MoveBy::create(0.1, Vec2(step, 0)));
-			soldiers[i].position += step;
-			if (soldiers[i].position > leftmost) {
-				leftmost = soldiers[i].position;
+		if (soldiers[i]->getPosition()+soldiers[i]->getSoldier()->getContentSize().width < rightmost) {
+			soldiers[i]->getSoldier()->runAction(MoveBy::create(0.1, Vec2(step, 0)));
+			soldiers[i]->setPosition(soldiers[i]->getPosition() + step);
+			if (soldiers[i]->getPosition() > leftmost) {
+				leftmost = soldiers[i]->getPosition();
 			}
 		}
+		maxn = max(maxn, soldiers[i]->getPosition());
 	}
+	leftmost = maxn;
+	maxn = 960;
 	for (int i = 0; i < enemy_soldiers.size(); i++) {
 		//enemy_soldiers[i].soldier->runAction(MoveBy::create(0.1, Vec2(-1 * step, 0)));
-		if (enemy_soldiers[i].position > leftmost + enemy_soldiers[i].soldier->getContentSize().width) {
-			enemy_soldiers[i].soldier->runAction(MoveBy::create(0.1, Vec2(-1 * step, 0)));
-			enemy_soldiers[i].position -= step;
-			if (enemy_soldiers[i].position < rightmost) {
-				rightmost = enemy_soldiers[i].position;
+		if (enemy_soldiers[i]->getPosition() > leftmost + enemy_soldiers[i]->getSoldier()->getContentSize().width) {
+			enemy_soldiers[i]->getSoldier()->runAction(MoveBy::create(0.1, Vec2(-1 * step, 0)));
+			enemy_soldiers[i]->setPosition(enemy_soldiers[i]->getPosition() - step);
+			if (enemy_soldiers[i]->getPosition() < rightmost) {
+				rightmost = enemy_soldiers[i]->getPosition();
 			}
 		}
+		maxn = min(maxn, enemy_soldiers[i]->getPosition());
+	}
+	rightmost = maxn;
+	int scnt = 0, sdmg = 0;
+	for (int i = 0; i < soldiers.size(); i++) {
+		if (soldiers[i]->getPosition() + soldiers[i]->getSoldier()->getContentSize().width < rightmost)continue;
+		scnt++; sdmg += getDMG(soldiers[i]->getType());
+	}
+	int dmgtoe = sdmg / (scnt==0?1:scnt);
+	int ecnt = 0, edmg = 0;
+	for (int i = 0; i < enemy_soldiers.size(); i++) {
+		if (enemy_soldiers[i]->getPosition() > leftmost + enemy_soldiers[i]->getSoldier()->getContentSize().width)continue;
+		ecnt++; edmg += getDMG(enemy_soldiers[i]->getType());
+	}
+	int dmgtos = edmg / (ecnt==0?1:ecnt);
+	for (int i = 0; i < soldiers.size(); i++) {
+		if (soldiers[i]->getPosition() + soldiers[i]->getSoldier()->getContentSize().width < rightmost)continue;
+		if (soldiers[i]->getHp() < dmgtos) {
+			this->removeChild(soldiers[i]->getSoldier());
+			delete soldiers[i];
+			soldiers.erase(soldiers.begin() + i);
+			i--;
+		}
+		else soldiers[i]->setHp(soldiers[i]->getHp() - dmgtos);
+	}
+	for (int i = 0; i < enemy_soldiers.size(); i++) {
+		if (enemy_soldiers[i]->getPosition() > leftmost + enemy_soldiers[i]->getSoldier()->getContentSize().width)continue;
+		if (enemy_soldiers[i]->getHp() < dmgtos) {
+			this->removeChild(enemy_soldiers[i]->getSoldier());
+			delete enemy_soldiers[i];
+			enemy_soldiers.erase(enemy_soldiers.begin() + i);
+			i--;
+		}
+		else enemy_soldiers[i]->setHp(enemy_soldiers[i]->getHp() - dmgtos);
 	}
 }
 
@@ -147,11 +210,11 @@ void BattleField::enemy_soldier_generater(float dt)
 
 	auto Footman = Sprite::create("Footman_enemy.png");
 	Footman->setAnchorPoint(Vec2(0, 0));
-	Footman->setPosition(Vec2(860, 10* CCRANDOM_0_1()));
-	soldierItem tmp;
-	tmp.soldier = Footman;
-	tmp.type = 1;
-	tmp.position = 860;
+	Footman->setPosition(Vec2(860, 30* CCRANDOM_0_1()));
+	soldierItem* tmp=soldierItem::getInstance(Footman, 860, FootmanHP, 1);
+	//tmp.soldier = Footman;
+	//tmp.type = 1;
+	//tmp.position = 860;
 	enemy_soldiers.push_back(tmp);
 	this->addChild(Footman);
 }
