@@ -7,6 +7,8 @@
 USING_NS_CC;
 using namespace cocos2d::ui;
 
+extern int DIFFICULTY;
+
 Scene* option::createScene()
 {
 	return option::create();
@@ -168,6 +170,7 @@ bool option::init()
 
 	// add "StartMenu" splash screen"
 	auto optionback = Sprite::create("scene1.png");
+	optionback->setScale(1.1);
 	//	sprite->setSkewX(20.0f);
 	if (optionback == nullptr)
 	{
