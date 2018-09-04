@@ -57,12 +57,10 @@ bool success::init()
 	// create menu, it's an autorelease object
 	auto menu1 = Menu::create(backItem, NULL);
 	menu1->setPosition(Vec2::ZERO);
-	this->addChild(menu1, 1);
+	this->addChild(menu1, 2);
 
 	/////////////////////////////
-	// 3. add your codes below...
-
-
+	
 
 	// add a label shows "Option"
 	// create and initialize a label
@@ -95,7 +93,7 @@ bool success::init()
 		startback->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 
 		// add the sprite as a child to this layer
-		this->addChild(startback, -1);
+		this->addChild(startback, -2);
 	}
 
 	return true;
