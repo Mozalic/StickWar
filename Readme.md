@@ -1,6 +1,6 @@
 # 报告
 
- ![https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true](https://ci.appveyor.com/api/projects/status/github/StickWar?svg=true) 
+ ![https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true](https://ci.appveyor.com/project/Mozalic/stickwar/build/1.0.14) 
  
 ## 2018年袁昕老师短学期课程
 ## 一、 问题和背景
