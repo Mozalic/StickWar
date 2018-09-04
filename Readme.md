@@ -42,9 +42,9 @@
 
 第三轮迭代完成了游戏主场景的更多功能。完成了游戏胜利和失败的界面。
 
-![3.1.png](Resources/images/3.1.png)
 ![3.2.png](Resources/images/3.2.png)
 ![3.3.png](Resources/images/3.3.png)
+![3.1.png](Resources/images/3.1.png)
 
 ## 五、小组成员
 
